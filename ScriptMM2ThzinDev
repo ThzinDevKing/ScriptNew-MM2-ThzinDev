@@ -1,0 +1,85 @@
+--[[
+	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
+]]
+--[[
+Credits goes to REDz.
+And you can find more here! [This is v5 version]
+https://github.com/REDzHUB/RedzLibV5
+And maybe some things may not work correctly (doesn't to me)
+]]--
+
+local redzlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/REDzHUB/RedzLibV5/main/Source.Lua"))()
+
+local Window = redzlib:MakeWindow({
+  Title = "Test",
+  SubTitle = "hello",
+  SaveFolder = "Redz Config"
+})
+
+--Tabs
+
+local Tab1 = Window:MakeTab({"Tab 1", "cool"})
+
+--Buttons
+
+Tab1:AddButton({"Print", function()
+print("Hello World!")
+end})
+
+local Toggle1 = Tab1:AddToggle({
+  Name = "Speed",
+  Description = "Idk",
+  Default = false
+})
+
+Tab1:AddSlider({
+  Name = "Speed",
+  Min = 1,
+  Max = 100,
+  Increase = 1,
+  Default = 16,
+  Callback = function(Value)
+  game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
+  end
+})
+-- Configurações do ESP
+local ESP = {
+    Enabled = true,
+    BoxColor = Color3.fromRGB(255, 0, 0), -- Cor da caixa (vermelho)
+    TextColor = Color3.fromRGB(255, 255, 255), -- Cor do texto (branco)
+    Distance = 1000 -- Distância máxima para mostrar ESP
+}
+
+-- Função para desenhar uma caixa ao redor do jogador
+function DrawBox(player)
+    local character = player.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        local rootPart = character.HumanoidRootPart
+        local screenPos, onScreen = workspace.CurrentCamera:WorldToViewportPoint(rootPart.Position)
+        if onScreen then
+            -- Desenhar a caixa (implementação depende da biblioteca gráfica usada)
+            -- Exemplo: Drawing a box using Drawing API
+            local box = Drawing.new("Square")
+            box.Size = Vector2.new(50, 50)
+            box.Position = Vector2.new(screenPos.X - 25, screenPos.Y - 25)
+            box.Color = ESP.BoxColor
+            box.Visible = true
+        end
+    end
+end
+
+-- Função principal do ESP
+function ESP:Render()
+    if not self.Enabled then return end
+
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player ~= game.Players.LocalPlayer then
+            DrawBox(player)
+        end
+    end
+end
+
+-- Loop principal
+game:GetService("RunService").RenderStepped:Connect(function()
+    ESP:Render()
+end)
